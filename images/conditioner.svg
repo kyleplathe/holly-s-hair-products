@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img">
+  <rect width="400" height="500" fill="#E3EAF2"/>
+  <text x="200" y="44" text-anchor="middle" fill="#5C534C" font-family="Georgia, 'Liberation Serif', serif" font-size="13" letter-spacing="3.2">PLACEHOLDER</text>
+  <line x1="156" y1="56" x2="244" y2="56" stroke="#C6A56A" stroke-width="1.5"/>
+  <ellipse cx="200" cy="430" rx="72" ry="10" fill="#241F1C" opacity="0.08"/>
+  
+  <rect x="174" y="108" width="52" height="16" rx="4" fill="#31465C"/>
+  <rect x="193" y="124" width="14" height="30" fill="#241F1C"/>
+  <rect x="166" y="152" width="68" height="12" rx="3" fill="#C6A56A"/>
+  <rect x="116" y="164" width="168" height="214" rx="34" fill="#FFFCF8" stroke="#241F1C" stroke-width="3"/>
+  <rect x="140" y="228" width="120" height="72" rx="8" fill="#E3EAF2"/>
+
+  <text x="200" y="274" text-anchor="middle" fill="#241F1C" font-family="Georgia, 'Liberation Serif', serif" font-size="15" letter-spacing="1.5">CONDITIONER</text>
+</svg>

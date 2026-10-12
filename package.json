@@ -1,0 +1,9 @@
+{
+  "name": "hollys-hair-products",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node test/pricing.test.js",
+    "deploy:cloudflare": "bash scripts/deploy-cloudflare.sh"
+  }
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img">
+  <rect width="400" height="500" fill="#F8E7E3"/>
+  <text x="200" y="44" text-anchor="middle" fill="#5C534C" font-family="Georgia, 'Liberation Serif', serif" font-size="13" letter-spacing="3.2">PLACEHOLDER</text>
+  <line x1="156" y1="56" x2="244" y2="56" stroke="#C6A56A" stroke-width="1.5"/>
+  <ellipse cx="200" cy="430" rx="72" ry="10" fill="#241F1C" opacity="0.08"/>
+  
+  <rect x="168" y="118" width="40" height="18" rx="4" fill="#31465C"/>
+  <path d="M208 126h34l8 10h-28z" fill="#241F1C"/>
+  <rect x="186" y="136" width="18" height="28" fill="#241F1C"/>
+  <rect x="124" y="164" width="152" height="210" rx="28" fill="#FFFCF8" stroke="#241F1C" stroke-width="3"/>
+  <rect x="146" y="230" width="108" height="70" rx="8" fill="#F8E7E3"/>
+
+  <text x="200" y="274" text-anchor="middle" fill="#241F1C" font-family="Georgia, 'Liberation Serif', serif" font-size="15" letter-spacing="1.5">HEAT SPRAY</text>
+</svg>
