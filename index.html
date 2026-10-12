@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Holly's Hair Products</title>
+  <meta name="description" content="The products Holly uses in the chair, ready for you to take home.">
+  <meta property="og:title" content="Holly's Hair Products">
+  <meta property="og:description" content="The products Holly uses in the chair, ready for you to take home.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f3efe8">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <p id="boot-error" class="boot-error" hidden></p>
+  <div id="announcement" class="announcement" hidden></div>
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="wordmark" href="#top">
+        <span class="mark" id="mark" aria-hidden="true">H</span>
+        <span id="wordmark">Holly's Hair Products</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="On this page"></nav>
+      <button type="button" class="cart-button" id="open-cart" data-action="open-cart" aria-label="Open bag">
+        <span>Bag</span>
+        <span class="cart-count" id="cart-count" hidden>0</span>
+      </button>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-inner" id="hero"></div>
+    </section>
+    <section class="section" id="shop" aria-labelledby="shop-heading">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="shop-heading">The shelf</h2>
+          <p id="shop-intro"></p>
+        </div>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+    </section>
+    <section class="section section-band" id="about" aria-labelledby="about-heading"></section>
+    <section class="section" id="how" aria-labelledby="how-heading"></section>
+    <section class="section section-band" id="faq" aria-labelledby="faq-heading"></section>
+    <section class="section" id="contact" aria-labelledby="contact-heading"></section>
+  </main>
+  <footer class="site-footer" id="footer"></footer>
+  <dialog class="cart-dialog" id="cart-dialog" aria-labelledby="cart-title">
+    <div class="cart-shell">
+      <header class="cart-header">
+        <h2 id="cart-title">Your bag</h2>
+        <button type="button" class="icon-button" data-action="close-cart" aria-label="Close bag">&times;</button>
+      </header>
+      <div class="cart-body" id="cart-body"></div>
+      <footer class="cart-footer" id="cart-footer"></footer>
+    </div>
+  </dialog>
+  <p id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></p>
+  <noscript>
+    <p class="boot-error">Turn on JavaScript to see the shop. Products and prices are loaded from site.js.</p>
+  </noscript>
+  <script src="pricing.js"></script>
+  <script src="site.js"></script>
+  <script>
+    if (!window.SITE) {
+      var boot = document.getElementById("boot-error");
+      boot.hidden = false;
+      boot.textContent = "Could not read site.js. If you just edited it, look for a missing comma or quote, then refresh.";
+      document.body.classList.add("is-ready");
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
