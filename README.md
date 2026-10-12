@@ -18,7 +18,7 @@ What lives in `site.js`:
 - Every product: name, description, size, price, photo, and the Placeholder badge
 - Pickup, local delivery, and shipping, including the fees
 - About, how it works, FAQ, phone, email, and the booking link
-- The pay-at-pickup wording and an optional Square or Stripe link
+- Pay at the salon wording, each product's Square link, and an optional order-level Square link
 
 To add a product, copy one whole product block and change `id` to a new word with no spaces (`leave-in`, not `leave in`). To hide a product without deleting it, add `"available": false`.
 
@@ -61,30 +61,45 @@ The bag is saved in the browser (`localStorage`) until checkout. Checkout asks f
 
 The total is subtotal plus the selected fee. Tax is not calculated. See below.
 
-Placing an order request does not charge a card. The confirmation shows the order number, the total, and **Pay at pickup**. It also offers:
+Placing an order request does not charge a card. The confirmation shows the order number and the total. It also offers:
 
 - **Copy order details**, to paste into a text
 - **Email this order to Holly**, which opens an email to `contact.email` (or `contact.orderEmail` if that is set)
-- **Pay now**, only after a payment link is pasted in
+- **Pay at the salon**, for pickup orders, on Holly's Square reader
+- **Pay now with Square**, when a Square payment link in `site.js` matches this bag
 
 A copy of the request is saved in that browser. Holly is not notified until someone emails it, or until `contact.formEndpoint` is filled in.
 
 `formEndpoint` is optional. Paste a Formspree (or similar) URL that accepts a JSON POST. Leave it as `""` to skip. Do not put API keys in this repo. The posted JSON includes the order number, items, fees, total, customer, fulfillment choice, and address when one was required.
 
-## Payments, for a one-person shop
+## Payments with Square
 
-Start with pay at pickup. Holly can take a card on the reader she already uses in the salon, or cash. This page is the order pad, not the card machine.
+Holly already uses Square at the chair. This page is the order pad. Square is the card machine. Pickup orders offer **Pay at the salon** (her Square reader). Nothing on this page asks for a card number.
 
-Square is the simplest next step if she already uses Square at the chair. Sales land in the same place as haircuts. In the Square dashboard, create a Payment Link and paste the public URL into `payment.paymentLink` in `site.js`. The confirmation page then shows **Pay now**. Stripe Payment Links work the same way if she would rather use Stripe.
+**Pay now with Square** appears when a public Square payment link is pasted into `site.js`. The button opens that link. Leave the links as `""` until they exist. Do not invent a URL.
 
-Two ways to plug a link in later:
+### Create a Square payment link
 
-1. **One link for the shop.** Paste it into `payment.paymentLink`. Any bag can show that button. A reusable link usually has a fixed amount, so it will not automatically match a mixed bag. For a custom total, Holly can send a Square invoice (or a one-off payment link) for that order. The request on this page is still the packing list.
-2. **One link per product.** Paste a URL into that product's `paymentLink`. The shop uses it only when the bag contains just that product. A mixed bag falls back to the shop link, or to pay at pickup if the shop link is empty.
+1. Sign in to the [Square Dashboard](https://app.squareup.com/dashboard/).
+2. Open **Online → Checkout links / Payment links**. Square sometimes labels the same screen **Payments & orders**, **Payments & invoices**, or **Payments → Payment links**. Choose **Payment links**, then **Create link**.
+3. Choose **Sell an item** and pick the product from Holly's Square item library. That keeps the price and the stock count in Square. This website does not track inventory. Use **Collect a payment** only for a one-off amount that is not a stocked item.
+4. Save, then copy the public link. It looks like `https://square.link/u/...`.
+5. Paste that link into `site.js` and save.
 
-Leave both blank to only offer pay at pickup. Set `payAtPickup` to `false` if you want to hide that note.
+Where to paste it:
 
-Never paste a Stripe secret key or a Square access token into `site.js` or this repo. Payment links are public URLs. Secret keys are not.
+- **One product.** Put the URL in that product's `squareLink`. Checkout uses it when the bag contains only that product (even if the quantity is more than one). A reusable link is often a fixed amount for one unit, so a quantity over one may not match the total on this page. The note under the button says so.
+- **A whole order.** Put one URL in `payment.squareLink`. Mixed bags, and any bag whose product has no `squareLink`, use this order-level link. Holly can create that link for a custom total, or send a Square invoice for that order. The request on this page is still the packing list.
+
+If a bag has more than one product and only per-product links are filled in, checkout does not open one of those links. It explains that a Square link here pays for one product at a time, and it falls back to **Pay at pickup**.
+
+Keep stock in Square. When the payment link sells an item from the item library, Square decrements that item. Update quantities in the Square item library, not in this repo.
+
+Never paste a Square access token, application secret, or personal access token into `site.js` or this repo. Payment links are public URLs. Tokens are not.
+
+### If she wants the cart inside Square
+
+Square Online's free plan is an alternative if Holly later wants full automatic checkout: a Square-hosted shop that charges the card, applies her Square items, and can calculate tax and shipping. This page can stay the short list she texts from the salon either way. The free plan does not have to replace it.
 
 ### Minnesota sales tax
 

@@ -58,20 +58,38 @@ assert.strictEqual(Pricing.formatMoney(11597), "$115.97");
 assert.strictEqual(Pricing.dollarsString(9100), "91.00");
 
 const products = [
-  { id: "a", paymentLink: "https://pay.example/a" },
-  { id: "b", paymentLink: "https://pay.example/b" }
+  { id: "a", squareLink: "https://square.link/u/a" },
+  { id: "b", squareLink: "https://square.link/u/b" },
+  { id: "c", squareLink: "" }
 ];
+const orderLink = { squareLink: "https://square.link/u/order" };
 assert.deepStrictEqual(
-  Pricing.resolvePaymentLink([{ id: "a" }], products, { paymentLink: "https://pay.example/shop" }),
-  { href: "https://pay.example/a", source: "product" }
+  Pricing.resolvePaymentLink([{ id: "a", qty: 2 }], products, orderLink),
+  { href: "https://square.link/u/a", source: "product", limited: false }
 );
 assert.deepStrictEqual(
-  Pricing.resolvePaymentLink([{ id: "a" }, { id: "b" }], products, { paymentLink: "https://pay.example/shop" }),
-  { href: "https://pay.example/shop", source: "shop" }
+  Pricing.resolvePaymentLink([{ id: "c" }], products, orderLink),
+  { href: "https://square.link/u/order", source: "order", limited: false }
 );
 assert.deepStrictEqual(
-  Pricing.resolvePaymentLink([{ id: "a" }, { id: "b" }], products, { paymentLink: "" }),
-  { href: "", source: "none" }
+  Pricing.resolvePaymentLink([{ id: "a" }, { id: "b" }], products, orderLink),
+  { href: "https://square.link/u/order", source: "order", limited: false }
+);
+assert.deepStrictEqual(
+  Pricing.resolvePaymentLink([{ id: "a" }, { id: "b" }], products, { squareLink: "" }),
+  { href: "", source: "multi", limited: true }
+);
+assert.deepStrictEqual(
+  Pricing.resolvePaymentLink([{ id: "a" }, { id: "c" }], products, { squareLink: "  " }),
+  { href: "", source: "multi", limited: true }
+);
+assert.deepStrictEqual(
+  Pricing.resolvePaymentLink([{ id: "c" }], products, { squareLink: "" }),
+  { href: "", source: "none", limited: false }
+);
+assert.deepStrictEqual(
+  Pricing.resolvePaymentLink([], products, orderLink),
+  { href: "", source: "none", limited: false }
 );
 
 const text = Pricing.formatOrderText(delivery, {
@@ -101,6 +119,14 @@ assert.strictEqual(pickupOption.needsAddress, false);
 assert.strictEqual(pickupOption.isDefault, true);
 assert.strictEqual(deliveryOption.needsAddress, true);
 assert.strictEqual(shippingOption.needsAddress, true);
+assert.strictEqual(typeof site.payment.squareLink, "string");
+assert.strictEqual(site.payment.squareLink, "");
+assert.strictEqual(site.payment.squareLinkLabel, "Pay now with Square");
+assert.strictEqual(site.payment.payAtSalonTitle, "Pay at the salon");
+site.products.forEach(function (product) {
+  assert.strictEqual(typeof product.squareLink, "string");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(product, "paymentLink"), false);
+});
 
 const sample = Pricing.buildOrder(
   { shampoo: 2, conditioner: 1 },
