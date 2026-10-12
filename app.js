@@ -105,6 +105,76 @@
     return "";
   }
 
+  function squareHref(value) {
+    var raw = String(value || "").trim();
+    if (!/^https?:\/\//i.test(raw)) return "";
+    return safeHttpUrl(raw);
+  }
+
+  function paymentView(order) {
+    var pay = SITE.payment || {};
+    var plan = order && order.payment
+      ? order.payment
+      : Pricing.resolvePaymentLink(order ? order.lines : [], visibleProducts(), pay);
+    var isPickup = Boolean(order && order.fulfillment && order.fulfillment.id === "pickup");
+    var href = plan && !plan.limited ? squareHref(plan.href) : "";
+    return { pay: pay, plan: plan || { href: "", source: "none", limited: false }, isPickup: isPickup, href: href };
+  }
+
+  function checkoutPayLine(order) {
+    var view = paymentView(order);
+    if (view.plan.limited) return view.pay.checkoutMulti || view.pay.multiItemNote || "";
+    if (view.isPickup && view.href) return view.pay.checkoutSalonAndSquare || "Pay at the salon with Holly's Square reader, or pay now with Square.";
+    if (view.isPickup) return view.pay.checkoutSalon || "Pay at the salon with Holly's Square reader.";
+    if (view.href) return view.pay.checkoutSquare || "Pay now with Square.";
+    return "";
+  }
+
+  function squareOfferCard(view) {
+    if (view.plan.limited && !view.isPickup) {
+      return el("div", { class: "pay-card", id: "pay-fallback" }, [
+        el("h3", { text: view.pay.multiItemTitle || "Pay at pickup" }),
+        el("p", { text: view.pay.multiItemNote || "A Square link pays for one product at a time. This bag has more than one product, so pay at pickup instead." })
+      ]);
+    }
+    if (!view.isPickup) return null;
+    var kids = [
+      el("h3", { text: view.pay.payAtSalonTitle || "Pay at the salon" }),
+      el("p", { text: view.pay.payAtSalonText || "Pay Holly at the salon with her Square reader." })
+    ];
+    if (view.plan.limited && view.pay.multiItemNote) {
+      kids.push(el("p", { text: view.pay.multiItemNote }));
+    }
+    return el("div", { class: "pay-card", id: "pay-at-salon" }, kids);
+  }
+
+  function squarePayLink(view) {
+    if (!view.href) return null;
+    return el("a", {
+      class: "btn",
+      id: "pay-square",
+      href: view.href,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      text: view.pay.squareLinkLabel || "Pay now with Square"
+    });
+  }
+
+  function fillPayPlan(box, order) {
+    var view = paymentView(order);
+    box.replaceChildren();
+    box.append(el("h3", { class: "form-heading", text: "How to pay" }));
+    var card = squareOfferCard(view);
+    if (card) box.append(card);
+    var link = squarePayLink(view);
+    if (link) {
+      box.append(link);
+      if (view.pay.squareLinkNote) box.append(el("p", { class: "fine", text: view.pay.squareLinkNote }));
+    } else if (!card) {
+      box.append(el("p", { text: view.pay.payLaterText || "Nothing is charged on this page. Holly will confirm payment when she gets this request." }));
+    }
+  }
+
   function safeImage(value) {
     var raw = String(value || "").trim();
     if (!raw || /^\s*javascript:/i.test(raw)) return "";
@@ -581,6 +651,9 @@
     form.append(list);
     form.append(el("button", { type: "button", class: "text-button", "data-action": "back-cart", text: "Edit bag" }));
     form.append(fulfillmentFieldset());
+    var payPlan = el("div", { id: "pay-plan" });
+    fillPayPlan(payPlan, order);
+    form.append(payPlan);
     form.append(el("h3", { class: "form-heading", text: "Who is this for?" }));
     form.append(textField("customer-name", "Name", "name", { autocomplete: "name", required: true }));
     form.append(textField("customer-phone", "Phone", "phone", { autocomplete: "tel", inputmode: "tel", type: "tel" }));
@@ -601,16 +674,12 @@
       return wrap;
     }
     var order = lastOrder;
-    var pay = SITE.payment || {};
+    var view = paymentView(order);
     wrap.append(el("p", { class: "eyebrow", text: "Nothing was charged" }));
     wrap.append(el("p", { class: "order-number", text: order.number }));
     wrap.append(el("p", { id: "form-status", class: "fine", text: "Saving this request in this browser." }));
-    if (pay.payAtPickup !== false) {
-      wrap.append(el("div", { class: "pay-card" }, [
-        el("h3", { text: pay.payAtPickupTitle || "Pay at pickup" }),
-        el("p", { text: pay.payAtPickupText || "Pay Holly in person. This page does not charge a card." })
-      ]));
-    }
+    var offer = squareOfferCard(view);
+    if (offer) wrap.append(offer);
     var list = el("ul", { class: "checkout-lines" });
     order.lines.forEach(function (line) {
       var size = line.size ? " (" + line.size + ")" : "";
@@ -637,16 +706,10 @@
         text: "Email this order to Holly"
       }));
     }
-    var payHref = order.payment && safeHttpUrl(order.payment.href);
-    if (payHref) {
-      actions.append(el("a", {
-        class: "btn",
-        href: payHref,
-        target: "_blank",
-        rel: "noopener noreferrer",
-        text: pay.paymentLinkLabel || "Pay now"
-      }));
-      if (pay.paymentLinkNote) actions.append(el("p", { class: "fine", text: pay.paymentLinkNote }));
+    var squareLink = squarePayLink(view);
+    if (squareLink) {
+      actions.append(squareLink);
+      if (view.pay.squareLinkNote) actions.append(el("p", { class: "fine", text: view.pay.squareLinkNote }));
     }
     wrap.append(actions);
     wrap.append(el("textarea", { id: "copy-fallback", class: "copy-fallback", readonly: "true", hidden: true }));
@@ -686,6 +749,8 @@
       footer.append(checkout);
     } else {
       if (SITE.taxNote) footer.append(el("p", { class: "fine", id: "tax-note", text: SITE.taxNote }));
+      var payLine = checkoutPayLine(order);
+      if (payLine) footer.append(el("p", { class: "fine", id: "pay-line", text: payLine }));
       var place = el("button", { type: "submit", class: "btn", form: "checkout-form", text: "Place order request" });
       place.disabled = order.lines.length === 0;
       footer.append(place);
@@ -974,6 +1039,8 @@
     var address = document.getElementById("address-fields");
     if (address) address.hidden = !(option && option.needsAddress);
     paintOptions();
+    var planBox = document.getElementById("pay-plan");
+    if (planBox) fillPayPlan(planBox, currentOrder());
     renderFooter();
   }
 

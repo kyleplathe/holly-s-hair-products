@@ -83,7 +83,7 @@ window.SITE = {
     "items": [
       {
         "q": "Is this a real charge?",
-        "a": "Not on this page. Placing an order request tells Holly what you want. You can pay at pickup, or use a payment link if she has added one. This page never asks for a card number."
+        "a": "Not on this page. Placing an order request tells Holly what you want. Pickup can be paid at the salon on Holly's Square reader. If a Square payment link is set up, you can also pay now with Square. This page never asks for a card number."
       },
       {
         "q": "When is pickup ready?",
@@ -113,21 +113,30 @@ window.SITE = {
     "instagram": ""
   },
 
-  /* PAYMENT
-     Leave paymentLink as "" to only offer pay at pickup.
-     Later, paste a Square or Stripe Payment Link between the quotes.
-     That link is public. Never paste a secret key in this file.
-     A link on one product (paymentLink on that product) is used only when
-     the bag contains just that product. The shop link is used for any other bag.
-     A reusable link often has a fixed amount, so it may not match a mixed bag
-     until Holly sends a per-order Square invoice or payment link. */
+  /* PAYMENT — Holly uses Square.
+     squareLink on a product is that product's Square payment link.
+     payment.squareLink is optional. It covers a whole order, including a mixed bag.
+     Leave both as "" and pickup only offers pay at the salon, on Holly's Square reader.
+     Paste the public link only (it looks like https://square.link/u/...).
+     Never paste a Square access token.
+     One product in the bag uses that product's squareLink.
+     More than one product cannot be combined into those per-product links.
+     A mixed bag uses payment.squareLink if it is set. Otherwise checkout
+     explains that and falls back to pay at pickup.
+     A reusable Square link is often one unit at a fixed amount. */
   "payment": {
-    "payAtPickup": true,
-    "payAtPickupTitle": "Pay at pickup",
-    "payAtPickupText": "Nothing is charged on this page. Pay Holly at the salon, or when she hands off a delivery, with the card reader or cash you already use.",
-    "paymentLink": "",
-    "paymentLinkLabel": "Pay now",
-    "paymentLinkNote": "Opens a Square or Stripe payment link. A reusable link may be a fixed amount, so check that it matches this total."
+    "payAtSalonTitle": "Pay at the salon",
+    "payAtSalonText": "Nothing is charged on this page. Pay Holly at the salon with her Square reader when you pick up.",
+    "squareLink": "",
+    "squareLinkLabel": "Pay now with Square",
+    "squareLinkNote": "Opens a Square payment link. A reusable link is often a fixed amount for one unit, so check that it matches this total.",
+    "multiItemTitle": "Pay at pickup",
+    "multiItemNote": "A Square link on this page pays for one product at a time. This bag has more than one product, so pay at pickup instead.",
+    "checkoutSalon": "Pay at the salon with Holly's Square reader.",
+    "checkoutSalonAndSquare": "Pay at the salon with Holly's Square reader, or pay now with Square.",
+    "checkoutSquare": "Pay now with Square.",
+    "checkoutMulti": "This bag has more than one product. Pay at pickup. A Square link covers one product at a time.",
+    "payLaterText": "Nothing is charged on this page. Holly will confirm payment when she gets this request."
   },
 
   "taxNote": "Tax is not added on this page. Retail hair products are generally taxable in Minnesota. Holly will confirm any tax before you pay.",
@@ -147,7 +156,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a shampoo bottle",
       "swatch": "#E5EEE7",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     },
     {
       "id": "conditioner",
@@ -159,7 +168,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a conditioner bottle",
       "swatch": "#E3EAF2",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     },
     {
       "id": "styling-cream",
@@ -171,7 +180,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a styling cream jar",
       "swatch": "#F4EBDD",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     },
     {
       "id": "hair-oil",
@@ -183,7 +192,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a hair oil bottle",
       "swatch": "#F8EBD4",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     },
     {
       "id": "heat-protectant",
@@ -195,7 +204,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a heat protectant spray bottle",
       "swatch": "#F8E7E3",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     },
     {
       "id": "dry-shampoo",
@@ -207,7 +216,7 @@ window.SITE = {
       "imageAlt": "Placeholder illustration of a dry shampoo can",
       "swatch": "#EEEAE3",
       "badge": "Placeholder",
-      "paymentLink": ""
+      "squareLink": ""
     }
   ]
 };

@@ -96,14 +96,25 @@
     (products || []).forEach(function (product) {
       if (product && product.id) byId[product.id] = product;
     });
-    var shopLink = payment && typeof payment.paymentLink === "string" ? payment.paymentLink.trim() : "";
-    if (lines && lines.length === 1) {
-      var product = byId[lines[0].id];
-      var productLink = product && typeof product.paymentLink === "string" ? product.paymentLink.trim() : "";
-      if (productLink) return { href: productLink, source: "product" };
+    var orderLink = payment && typeof payment.squareLink === "string" ? payment.squareLink.trim() : "";
+    var lineList = Array.isArray(lines) ? lines : [];
+    var linked = [];
+    lineList.forEach(function (line) {
+      if (!line || !line.id) return;
+      var product = byId[line.id];
+      var href = product && typeof product.squareLink === "string" ? product.squareLink.trim() : "";
+      if (href) linked.push(href);
+    });
+    if (lineList.length === 1 && linked.length === 1) {
+      return { href: linked[0], source: "product", limited: false };
     }
-    if (shopLink) return { href: shopLink, source: "shop" };
-    return { href: "", source: "none" };
+    if (lineList.length > 0 && orderLink) {
+      return { href: orderLink, source: "order", limited: false };
+    }
+    if (lineList.length > 1 && linked.length > 0) {
+      return { href: "", source: "multi", limited: true };
+    }
+    return { href: "", source: "none", limited: false };
   }
 
   function formatOrderText(order, customer, extra) {
